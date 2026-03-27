@@ -1,7 +1,7 @@
 'use client';
 
 import { Paper, TextSummary } from '@/lib/types';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { summaryService } from '@/lib/services/summaryService';
 
 interface SummaryPanelProps {
@@ -13,6 +13,9 @@ export default function SummaryPanel({ paper, onClose }: SummaryPanelProps) {
   const [summary, setSummary] = useState<TextSummary | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [podcastLoading, setPodcastLoading] = useState(false);
+  const [podcastUrl, setPodcastUrl] = useState<string | null>(null);
+  const podcastUrlRef = useRef<string | null>(null);
 
   useEffect(() => {
     if (!paper) return;
@@ -21,18 +24,17 @@ export default function SummaryPanel({ paper, onClose }: SummaryPanelProps) {
       try {
         setLoading(true);
         setError(null);
+        setSummary(null);
+        setPodcastUrl(null);
 
-        // Try to get existing summary
         let existingSummary = await summaryService.getTextSummary(paper.id);
-
         if (!existingSummary) {
-          // Generate new summary if it doesn't exist
           existingSummary = await summaryService.generateTextSummary(
             paper.id,
-            paper.abstract
+            paper.abstract,
+            paper.title
           );
         }
-
         setSummary(existingSummary);
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Failed to load summary');
@@ -42,7 +44,42 @@ export default function SummaryPanel({ paper, onClose }: SummaryPanelProps) {
     };
 
     fetchOrGenerateSummary();
+
+    return () => {
+      if (podcastUrlRef.current) {
+        URL.revokeObjectURL(podcastUrlRef.current);
+      }
+    };
   }, [paper]);
+
+  const handlePodcast = async () => {
+    if (!paper || podcastLoading) return;
+
+    if (podcastUrl) {
+      setPodcastUrl(null);
+      return;
+    }
+
+    try {
+      setPodcastLoading(true);
+      const response = await fetch('/api/summaries/podcast', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ paperId: paper.id, title: paper.title, abstract: paper.abstract }),
+      });
+
+      if (!response.ok) throw new Error('Failed to generate podcast');
+
+      const blob = await response.blob();
+      const url = URL.createObjectURL(blob);
+      podcastUrlRef.current = url;
+      setPodcastUrl(url);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to generate podcast');
+    } finally {
+      setPodcastLoading(false);
+    }
+  };
 
   if (!paper) return null;
 
@@ -53,13 +90,11 @@ export default function SummaryPanel({ paper, onClose }: SummaryPanelProps) {
         <div className="sticky top-0 bg-gradient-to-r from-blue-600 to-purple-600 text-white p-6 flex items-start justify-between">
           <div className="flex-1">
             <h2 className="text-2xl font-bold mb-2">{paper.title}</h2>
-            <p className="text-blue-100 text-sm">
-              {paper.authors.join(', ')}
-            </p>
+            <p className="text-blue-100 text-sm">{paper.authors.join(', ')}</p>
           </div>
           <button
             onClick={onClose}
-            className="text-white hover:text-blue-100 text-2xl font-bold"
+            className="text-white hover:text-blue-100 text-2xl font-bold ml-4"
           >
             ✕
           </button>
@@ -70,7 +105,7 @@ export default function SummaryPanel({ paper, onClose }: SummaryPanelProps) {
           {loading && (
             <div className="flex items-center justify-center py-8">
               <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-              <span className="ml-3 text-gray-600">Generating summary...</span>
+              <span className="ml-3 text-gray-600">Generating AI summary…</span>
             </div>
           )}
 
@@ -83,8 +118,25 @@ export default function SummaryPanel({ paper, onClose }: SummaryPanelProps) {
           {summary && !loading && (
             <div className="space-y-4">
               <div>
-                <h3 className="text-lg font-semibold text-gray-900 mb-2">Summary</h3>
+                <div className="flex items-center justify-between mb-2">
+                  <h3 className="text-lg font-semibold text-gray-900">AI Summary</h3>
+                  <button
+                    onClick={handlePodcast}
+                    disabled={podcastLoading}
+                    className="flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm font-medium transition bg-purple-50 text-purple-700 hover:bg-purple-100 disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    {podcastLoading ? '⏳ Generating…' : '🎙 Podcast'}
+                  </button>
+                </div>
                 <p className="text-gray-700 leading-relaxed">{summary.content}</p>
+                {podcastUrl && (
+                  <audio
+                    src={podcastUrl}
+                    controls
+                    autoPlay
+                    className="w-full mt-4"
+                  />
+                )}
               </div>
 
               <div className="bg-gray-50 p-4 rounded-lg">
@@ -92,7 +144,7 @@ export default function SummaryPanel({ paper, onClose }: SummaryPanelProps) {
                 <div className="grid grid-cols-2 gap-4 text-sm text-gray-600">
                   <div>
                     <span className="font-medium">Published:</span>{' '}
-                    {new Date(paper.publishedDate).toLocaleDateString()}
+                    {new Date(paper.publishedDate).toLocaleDateString('en-GB')}
                   </div>
                   <div>
                     <span className="font-medium">Citations:</span> {paper.citations}

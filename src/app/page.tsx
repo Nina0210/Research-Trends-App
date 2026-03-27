@@ -1,89 +1,74 @@
-"use client";
+import { Suspense } from 'react';
+import Header from '@/components/common/Header';
+import PapersList from '@/components/papers/PapersList';
+import TopicSelector from '@/components/papers/TopicSelector';
+import { fetchArxivTrending } from '@/lib/services/arxivService';
+import type { Paper } from '@/lib/types';
 
-import { useState, useEffect } from "react";
-import Header from "@/components/common/Header";
-import PaperCard from "@/components/papers/PaperCard";
-import SummaryPanel from "@/components/summaries/SummaryPanel";
-import AudioPlayer from "@/components/audio/AudioPlayer";
-import type { Paper } from "@/lib/types";
+interface HomeProps {
+  searchParams: Promise<{ topic?: string }>;
+}
 
-// fetched papers
-// initial empty array; we'll load trending papers from our API route
-// (falls back to empty list while loading)
+async function PapersSection({ topic }: { topic: string }) {
+  let papers: Paper[] = [];
+  let error: string | null = null;
 
-export default function Home() {
-  const [selectedPaper, setSelectedPaper] = useState<Paper | null>(null);
-  const [papers, setPapers] = useState<Paper[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  try {
+    papers = await fetchArxivTrending(topic, 10);
+  } catch (err) {
+    error = err instanceof Error ? err.message : 'Failed to load papers';
+  }
 
-  useEffect(() => {
-    let mounted = true;
-    const fetchTrending = async () => {
-      setLoading(true);
-      setError(null);
-      try {
-        const res = await fetch('/api/papers/trending');
-        if (!res.ok) throw new Error(`Fetch failed: ${res.status}`);
-        const json = await res.json();
-        if (json.success && json.data?.papers) {
-          if (mounted) setPapers(json.data.papers);
-        } else {
-          throw new Error(json.error || 'Failed to load papers');
-        }
-      } catch (err) {
-        if (mounted) setError(err instanceof Error ? err.message : String(err));
-      } finally {
-        if (mounted) setLoading(false);
-      }
-    };
+  if (error) {
+    return <p className="text-sm text-red-600">{error}</p>;
+  }
 
-    fetchTrending();
-    return () => {
-      mounted = false;
-    };
-  }, []);
+  if (papers.length === 0) {
+    return <p className="text-sm text-gray-600">No trending papers found.</p>;
+  }
+
+  return <PapersList papers={papers} />;
+}
+
+export default async function Home({ searchParams }: HomeProps) {
+  const { topic = 'cs.AI' } = await searchParams;
+
+  const topicLabel: Record<string, string> = {
+    'cs.AI': 'Artificial Intelligence',
+    'cs.LG': 'Machine Learning',
+    'cs.CL': 'Natural Language Processing',
+    'cs.CV': 'Computer Vision',
+    'cs.RO': 'Robotics',
+    'quant-ph': 'Quantum Computing',
+    'physics': 'Physics',
+  };
 
   return (
     <div className="min-h-screen bg-white font-sans">
       <Header />
 
-      <main className="max-w-7xl mx-auto p-6">
-        <section className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div className="md:col-span-2 space-y-4">
-            <h2 className="text-2xl font-semibold text-blue-600">Trending Papers</h2>
-            <div className="grid grid-cols-1 gap-4">
-              {loading && <div className="text-sm text-gray-600">Loading papers…</div>}
-              {error && <div className="text-sm text-red-600">{error}</div>}
-              {!loading && !error && papers.length === 0 && (
-                <div className="text-sm text-gray-600">No trending papers found.</div>
-              )}
-              {!loading && !error &&
-                papers.map((p) => (
-                  <PaperCard key={p.id} paper={p} onSelectSummary={setSelectedPaper} />
-                ))}
+      <main className="max-w-5xl mx-auto p-6 space-y-6">
+        {/* Topic selector */}
+        <div className="space-y-3">
+          <h2 className="text-2xl font-semibold text-blue-600">
+            Trending Papers — {topicLabel[topic] ?? topic}
+          </h2>
+          <Suspense fallback={null}>
+            <TopicSelector />
+          </Suspense>
+        </div>
+
+        {/* Papers list — fetched server-side */}
+        <Suspense
+          fallback={
+            <div className="flex items-center gap-3 text-gray-500 text-sm py-8">
+              <span className="inline-block animate-spin rounded-full h-5 w-5 border-b-2 border-blue-600" />
+              Loading papers…
             </div>
-          </div>
-
-          <aside className="space-y-4">
-            <h3 className="text-lg font-medium">Audio Summaries</h3>
-            <AudioPlayer
-              audioUrl="/audio/sample-audio.mp3"
-              title={papers[0]?.title ?? 'Sample audio'}
-              duration={65}
-            />
-
-            <div className="bg-white rounded-lg p-4 border border-gray-200">
-              <h4 className="font-semibold mb-2">Quick Stats</h4>
-              <p className="text-sm text-gray-600">Total trending papers: {papers.length}</p>
-            </div>
-          </aside>
-        </section>
-
-        {/* Summary modal/panel */}
-        {selectedPaper && (
-          <SummaryPanel paper={selectedPaper} onClose={() => setSelectedPaper(null)} />
-        )}
+          }
+        >
+          <PapersSection topic={topic} />
+        </Suspense>
       </main>
     </div>
   );

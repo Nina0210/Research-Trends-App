@@ -11,14 +11,14 @@ export class SummaryService {
   /**
    * Generate a text summary for a paper
    */
-  async generateTextSummary(paperId: string, abstract: string): Promise<TextSummary> {
+  async generateTextSummary(paperId: string, abstract: string, title?: string): Promise<TextSummary> {
     try {
       const response = await fetch(`${this.baseUrl}/summaries/text`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ paperId, abstract }),
+        body: JSON.stringify({ paperId, abstract, title }),
       });
 
       if (!response.ok) {

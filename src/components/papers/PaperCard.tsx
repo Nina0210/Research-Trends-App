@@ -2,7 +2,9 @@
 
 import { Paper } from '@/lib/types';
 import { useState } from 'react';
-
+import { Card, CardContent } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 
 interface PaperCardProps {
   paper: Paper;
@@ -13,23 +15,21 @@ export default function PaperCard({ paper, onSelectSummary }: PaperCardProps) {
   const [isExpanded, setIsExpanded] = useState(false);
 
   return (
-    <div className="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow border border-gray-200 overflow-hidden">
-      <div className="p-6">
-        {/* Trending Badge */}
+    <Card>
+      <CardContent className="p-6">
+        {/* Title + Trending Badge */}
         <div className="flex items-start justify-between mb-3">
-          <div className="flex-1">
-            <a
-              href={paper.url}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-xl font-semibold text-blue-600 hover:text-blue-800 line-clamp-2"
-            >
-              {paper.title}
-            </a>
-          </div>
-          <div className="ml-2 bg-orange-100 text-orange-800 px-3 py-1 rounded-full text-sm font-semibold whitespace-nowrap">
+          <a
+            href={paper.url}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-xl font-semibold text-blue-600 hover:text-blue-800 line-clamp-2 flex-1"
+          >
+            {paper.title}
+          </a>
+          <Badge variant="secondary" className="ml-2 whitespace-nowrap bg-orange-100 text-orange-800">
             Trending {Math.round(paper.trendingScore)}%
-          </div>
+          </Badge>
         </div>
 
         {/* Authors */}
@@ -39,10 +39,10 @@ export default function PaperCard({ paper, onSelectSummary }: PaperCardProps) {
         </p>
 
         {/* Category and Date */}
-        <div className="flex items-center space-x-4 mb-3 text-gray-500 text-sm">
-          <span className="bg-blue-50 px-3 py-1 rounded-full">{paper.category}</span>
-          <span>{new Date(paper.publishedDate).toLocaleDateString()}</span>
-          <span>{paper.citations} citations</span>
+        <div className="flex items-center gap-2 mb-3">
+          <Badge variant="outline">{paper.category}</Badge>
+          <span className="text-gray-500 text-sm">{new Date(paper.publishedDate).toLocaleDateString('en-GB')}</span>
+          <span className="text-gray-500 text-sm">{paper.citations} citations</span>
         </div>
 
         {/* Abstract */}
@@ -52,22 +52,16 @@ export default function PaperCard({ paper, onSelectSummary }: PaperCardProps) {
 
         {/* Actions */}
         <div className="flex gap-2">
-          <button
-            onClick={() => setIsExpanded(!isExpanded)}
-            className="text-blue-600 hover:text-blue-800 text-sm font-medium"
-          >
+          <Button variant="ghost" size="sm" onClick={() => setIsExpanded(!isExpanded)}>
             {isExpanded ? 'Show Less' : 'Show More'}
-          </button>
+          </Button>
           {onSelectSummary && (
-            <button
-              onClick={() => onSelectSummary(paper)}
-              className="ml-auto bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition"
-            >
+            <Button size="sm" className="ml-auto" onClick={() => onSelectSummary(paper)}>
               View Summary
-            </button>
+            </Button>
           )}
         </div>
-      </div>
-    </div>
+      </CardContent>
+    </Card>
   );
 }
