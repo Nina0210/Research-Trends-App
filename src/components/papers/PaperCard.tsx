@@ -41,7 +41,7 @@ export default function PaperCard({ paper, onSelectSummary }: PaperCardProps) {
         {/* Category and Date */}
         <div className="flex items-center space-x-4 mb-3 text-gray-500 text-sm">
           <span className="bg-blue-50 px-3 py-1 rounded-full">{paper.category}</span>
-          <span>{new Date(paper.publishedDate).toLocaleDateString()}</span>
+          <span>{new Date(paper.publishedDate).toLocaleDateString('en-GB')}</span>
           <span>{paper.citations} citations</span>
         </div>
 

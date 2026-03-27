@@ -10,7 +10,7 @@ async function fetchText(url: string) {
 }
 
 function extractSingle(tag: string, text: string) {
-  const re = new RegExp(`<${tag}[^>]*>([\s\S]*?)<\/${tag}>`, 'i');
+  const re = new RegExp(`<${tag}[^>]*>([\\s\\S]*?)<\\/${tag}>`, 'i');
   const m = text.match(re);
   return m ? m[1].trim() : '';
 }

@@ -1,13 +1,16 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { TextSummary } from '@/lib/types';
+import Anthropic from '@anthropic-ai/sdk';
+import { getCachedSummary, setCachedSummary } from '@/lib/cache';
+
+const client = new Anthropic();
 
 /**
  * POST /api/summaries/text
- * Generate a text summary for a paper
+ * Generate an accessible text summary for a research paper using Claude.
  */
 export async function POST(request: NextRequest) {
   try {
-    const { paperId, abstract } = await request.json();
+    const { paperId, title, abstract } = await request.json();
 
     if (!paperId || !abstract) {
       return NextResponse.json(
@@ -16,51 +19,44 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // TODO: Integrate with summarization service:
-    // - OpenAI API (GPT-4)
-    // - Anthropic Claude
-    // - Open source models (Hugging Face)
+    const cached = getCachedSummary(paperId);
+    if (cached) return NextResponse.json(cached);
 
-    // Mock summary for now
-    const summary: TextSummary = {
-      id: `summary-${Date.now()}`,
+    const stream = client.messages.stream({
+      model: 'claude-opus-4-6',
+      max_tokens: 600,
+      thinking: { type: 'adaptive' },
+      messages: [
+        {
+          role: 'user',
+          content: `You are a science communicator writing for a curious general audience. Summarize this research paper in 3–4 clear, engaging sentences. Explain what was done, why it matters, and what was discovered — no jargon.
+
+Title: ${title ?? 'Research Paper'}
+Abstract: ${abstract}
+
+Provide only the summary text, with no preamble or labels.`,
+        },
+      ],
+    });
+
+    const response = await stream.finalMessage();
+    const textBlock = response.content.find((b) => b.type === 'text');
+    const content = textBlock && textBlock.type === 'text' ? textBlock.text : 'Summary unavailable.';
+
+    const result = {
+      id: `summary-${paperId}-${Date.now()}`,
       paperId,
-      content: `This paper proposes a novel approach to ${abstract.substring(0, 50)}... The authors demonstrate significant improvements over existing methods through comprehensive experiments.`,
+      content,
       createdAt: new Date(),
       updatedAt: new Date(),
     };
 
-    return NextResponse.json(summary);
+    setCachedSummary(paperId, result);
+    return NextResponse.json(result);
   } catch (error) {
     console.error('Error generating summary:', error);
     return NextResponse.json(
       { error: 'Failed to generate summary' },
-      { status: 500 }
-    );
-  }
-}
-
-/**
- * GET /api/summaries/text/[paperId]
- */
-export async function GET(request: NextRequest) {
-  try {
-    const paperId = request.nextUrl.pathname.split('/').pop();
-
-    if (!paperId) {
-      return NextResponse.json(
-        { error: 'Paper ID is required' },
-        { status: 400 }
-      );
-    }
-
-    // TODO: Fetch from database
-    // For now, return null to trigger generation
-    return NextResponse.json(null);
-  } catch (error) {
-    console.error('Error fetching summary:', error);
-    return NextResponse.json(
-      { error: 'Failed to fetch summary' },
       { status: 500 }
     );
   }
