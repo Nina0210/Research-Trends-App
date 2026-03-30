@@ -23,7 +23,7 @@ export default function PaperCard({ paper, onSelectSummary }: PaperCardProps) {
             href={paper.url}
             target="_blank"
             rel="noopener noreferrer"
-            className="text-xl font-semibold text-blue-600 hover:text-blue-800 line-clamp-2 flex-1"
+            className="text-xl font-semibold text-blue-950 hover:text-blue-700 line-clamp-2 flex-1"
           >
             {paper.title}
           </a>

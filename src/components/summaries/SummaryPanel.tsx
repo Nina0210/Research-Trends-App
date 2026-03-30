@@ -87,14 +87,14 @@ export default function SummaryPanel({ paper, onClose }: SummaryPanelProps) {
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
       <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
         {/* Header */}
-        <div className="sticky top-0 bg-gradient-to-r from-blue-600 to-purple-600 text-white p-6 flex items-start justify-between">
+        <div className="sticky top-0 bg-gradient-to-r from-blue-950 to-blue-800 text-white p-6 flex items-start justify-between">
           <div className="flex-1">
             <h2 className="text-2xl font-bold mb-2">{paper.title}</h2>
-            <p className="text-blue-100 text-sm">{paper.authors.join(', ')}</p>
+            <p className="text-blue-200 text-sm">{paper.authors.join(', ')}</p>
           </div>
           <button
             onClick={onClose}
-            className="text-white hover:text-blue-100 text-2xl font-bold ml-4"
+            className="text-white hover:text-blue-200 text-2xl font-bold ml-4"
           >
             ✕
           </button>
@@ -104,7 +104,7 @@ export default function SummaryPanel({ paper, onClose }: SummaryPanelProps) {
         <div className="p-6">
           {loading && (
             <div className="flex items-center justify-center py-8">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-900"></div>
               <span className="ml-3 text-gray-600">Generating AI summary…</span>
             </div>
           )}
@@ -123,7 +123,7 @@ export default function SummaryPanel({ paper, onClose }: SummaryPanelProps) {
                   <button
                     onClick={handlePodcast}
                     disabled={podcastLoading}
-                    className="flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm font-medium transition bg-purple-50 text-purple-700 hover:bg-purple-100 disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm font-medium transition bg-blue-50 text-blue-900 hover:bg-blue-100 disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     {podcastLoading ? '⏳ Generating…' : '🎙 Podcast'}
                   </button>
@@ -139,7 +139,7 @@ export default function SummaryPanel({ paper, onClose }: SummaryPanelProps) {
                 )}
               </div>
 
-              <div className="bg-gray-50 p-4 rounded-lg">
+              <div className="bg-blue-50 p-4 rounded-lg">
                 <h4 className="font-semibold text-gray-900 mb-2">Paper Details</h4>
                 <div className="grid grid-cols-2 gap-4 text-sm text-gray-600">
                   <div>
@@ -164,7 +164,7 @@ export default function SummaryPanel({ paper, onClose }: SummaryPanelProps) {
             href={paper.url}
             target="_blank"
             rel="noopener noreferrer"
-            className="flex-1 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium text-center transition"
+            className="flex-1 bg-blue-950 hover:bg-blue-900 text-white px-4 py-2 rounded-lg font-medium text-center transition"
           >
             Read Full Paper
           </a>

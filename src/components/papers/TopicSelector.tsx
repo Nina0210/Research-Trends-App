@@ -31,8 +31,8 @@ export default function TopicSelector() {
           onClick={() => select(value)}
           className={`px-4 py-1.5 rounded-full text-sm font-medium transition ${
             current === value
-              ? 'bg-blue-600 text-white'
-              : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+              ? 'bg-blue-950 text-white shadow-sm'
+              : 'bg-white text-blue-900 border border-blue-200 hover:bg-blue-50'
           }`}
         >
           {label}
