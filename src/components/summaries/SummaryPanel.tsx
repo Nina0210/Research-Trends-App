@@ -1,21 +1,26 @@
 'use client';
 
 import { Paper, TextSummary } from '@/lib/types';
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { summaryService } from '@/lib/services/summaryService';
 
 interface SummaryPanelProps {
   paper: Paper | null;
   onClose: () => void;
+  podcastUrl: string | null;
+  onPodcastGenerated: (url: string) => void;
 }
 
-export default function SummaryPanel({ paper, onClose }: SummaryPanelProps) {
+export default function SummaryPanel({ paper, onClose, podcastUrl, onPodcastGenerated }: SummaryPanelProps) {
   const [summary, setSummary] = useState<TextSummary | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [podcastLoading, setPodcastLoading] = useState(false);
-  const [podcastUrl, setPodcastUrl] = useState<string | null>(null);
-  const podcastUrlRef = useRef<string | null>(null);
+
+  useEffect(() => {
+    document.body.style.overflow = 'hidden';
+    return () => { document.body.style.overflow = ''; };
+  }, []);
 
   useEffect(() => {
     if (!paper) return;
@@ -25,7 +30,6 @@ export default function SummaryPanel({ paper, onClose }: SummaryPanelProps) {
         setLoading(true);
         setError(null);
         setSummary(null);
-        setPodcastUrl(null);
 
         let existingSummary = await summaryService.getTextSummary(paper.id);
         if (!existingSummary) {
@@ -45,20 +49,11 @@ export default function SummaryPanel({ paper, onClose }: SummaryPanelProps) {
 
     fetchOrGenerateSummary();
 
-    return () => {
-      if (podcastUrlRef.current) {
-        URL.revokeObjectURL(podcastUrlRef.current);
-      }
-    };
+    return () => {};
   }, [paper]);
 
   const handlePodcast = async () => {
     if (!paper || podcastLoading) return;
-
-    if (podcastUrl) {
-      setPodcastUrl(null);
-      return;
-    }
 
     try {
       setPodcastLoading(true);
@@ -72,8 +67,7 @@ export default function SummaryPanel({ paper, onClose }: SummaryPanelProps) {
 
       const blob = await response.blob();
       const url = URL.createObjectURL(blob);
-      podcastUrlRef.current = url;
-      setPodcastUrl(url);
+      onPodcastGenerated(url);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to generate podcast');
     } finally {
@@ -84,7 +78,7 @@ export default function SummaryPanel({ paper, onClose }: SummaryPanelProps) {
   if (!paper) return null;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+    <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center p-4 z-50">
       <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
         {/* Header */}
         <div className="sticky top-0 bg-gradient-to-r from-blue-950 to-blue-800 text-white p-6 flex items-start justify-between">
@@ -120,20 +114,21 @@ export default function SummaryPanel({ paper, onClose }: SummaryPanelProps) {
               <div>
                 <div className="flex items-center justify-between mb-2">
                   <h3 className="text-lg font-semibold text-gray-900">AI Summary</h3>
-                  <button
-                    onClick={handlePodcast}
-                    disabled={podcastLoading}
-                    className="flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm font-medium transition bg-blue-50 text-blue-900 hover:bg-blue-100 disabled:opacity-50 disabled:cursor-not-allowed"
-                  >
-                    {podcastLoading ? '⏳ Generating…' : '🎙 Podcast'}
-                  </button>
+                  {!podcastUrl && (
+                    <button
+                      onClick={handlePodcast}
+                      disabled={podcastLoading}
+                      className="flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm font-medium transition bg-blue-50 text-blue-900 hover:bg-blue-100 disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      {podcastLoading ? '⏳ Generating…' : '🎙 Generate Podcast'}
+                    </button>
+                  )}
                 </div>
                 <p className="text-gray-700 leading-relaxed">{summary.content}</p>
                 {podcastUrl && (
                   <audio
                     src={podcastUrl}
                     controls
-                    autoPlay
                     className="w-full mt-4"
                   />
                 )}

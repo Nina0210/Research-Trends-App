@@ -11,6 +11,7 @@ interface PapersListProps {
 
 export default function PapersList({ papers }: PapersListProps) {
   const [selectedPaper, setSelectedPaper] = useState<Paper | null>(null);
+  const [podcastUrls, setPodcastUrls] = useState<Record<string, string>>({});
 
   return (
     <>
@@ -21,7 +22,12 @@ export default function PapersList({ papers }: PapersListProps) {
       </div>
 
       {selectedPaper && (
-        <SummaryPanel paper={selectedPaper} onClose={() => setSelectedPaper(null)} />
+        <SummaryPanel
+          paper={selectedPaper}
+          onClose={() => setSelectedPaper(null)}
+          podcastUrl={podcastUrls[selectedPaper.id] ?? null}
+          onPodcastGenerated={(url) => setPodcastUrls(prev => ({ ...prev, [selectedPaper.id]: url }))}
+        />
       )}
     </>
   );

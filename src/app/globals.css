@@ -129,7 +129,7 @@
   }
 }
 
-@layer components {
+@layer components {  
   .btn-topic {
     @apply px-4 py-1.5 rounded-full text-sm font-medium transition;
     @apply bg-card text-muted-foreground border border-border;
@@ -139,4 +139,6 @@
     @apply px-4 py-1.5 rounded-full text-sm font-medium transition;
     @apply bg-[#b913df] text-white shadow-sm;
   }
+
+
 }

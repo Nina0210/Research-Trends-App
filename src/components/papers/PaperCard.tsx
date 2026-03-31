@@ -5,6 +5,7 @@ import { useState } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { Maximize2 } from 'lucide-react';
 
 interface PaperCardProps {
   paper: Paper;
@@ -52,12 +53,9 @@ export default function PaperCard({ paper, onSelectSummary }: PaperCardProps) {
 
         {/* Actions */}
         <div className="flex gap-2 mt-3 pt-3 border-t border-border">
-          <Button variant="ghost" size="sm" className="text-xs text-muted-foreground hover:text-foreground h-7 px-2" onClick={() => setIsExpanded(!isExpanded)}>
-            {isExpanded ? 'Show Less' : 'Show More'}
-          </Button>
           {onSelectSummary && (
-            <Button size="sm" className="ml-auto text-xs h-7 px-3 bg-primary hover:bg-primary/90" onClick={() => onSelectSummary(paper)}>
-              Summary
+            <Button size="icon" variant="ghost" className="ml-auto h-7 w-7 text-muted-foreground hover:text-white" onClick={() => onSelectSummary(paper)}>
+              <Maximize2 size={15} />
             </Button>
           )}
         </div>
