@@ -14,7 +14,7 @@ export default function PapersList({ papers }: PapersListProps) {
 
   return (
     <>
-      <div className="grid grid-cols-1 gap-4">
+      <div className="grid grid-cols-3 gap-4">
         {papers.map((p) => (
           <PaperCard key={p.id} paper={p} onSelectSummary={setSelectedPaper} />
         ))}

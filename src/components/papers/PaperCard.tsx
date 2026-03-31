@@ -15,49 +15,49 @@ export default function PaperCard({ paper, onSelectSummary }: PaperCardProps) {
   const [isExpanded, setIsExpanded] = useState(false);
 
   return (
-    <Card>
-      <CardContent className="p-6">
+    <Card className="aspect-square flex flex-col overflow-hidden border-border bg-card">
+      <CardContent className="p-5 flex flex-col h-full">
         {/* Title + Trending Badge */}
-        <div className="flex items-start justify-between mb-3">
+        <div className="flex items-start justify-between mb-2">
           <a
             href={paper.url}
             target="_blank"
             rel="noopener noreferrer"
-            className="text-xl font-semibold text-blue-950 hover:text-blue-700 line-clamp-2 flex-1"
+            className="text-base font-semibold text-foreground hover:text-primary line-clamp-2 flex-1 leading-snug"
           >
             {paper.title}
           </a>
-          <Badge variant="secondary" className="ml-2 whitespace-nowrap bg-orange-100 text-orange-800">
-            Trending {Math.round(paper.trendingScore)}%
+          <Badge variant="secondary" className="ml-2 whitespace-nowrap shrink-0 bg-orange-900/40 text-orange-300 border-orange-800/50">
+            {Math.round(paper.trendingScore)}%
           </Badge>
         </div>
 
         {/* Authors */}
-        <p className="text-gray-600 text-sm mb-3">
+        <p className="text-muted-foreground text-xs mb-2 line-clamp-1">
           {paper.authors.slice(0, 3).join(', ')}
           {paper.authors.length > 3 && ` +${paper.authors.length - 3} more`}
         </p>
 
         {/* Category and Date */}
-        <div className="flex items-center gap-2 mb-3">
-          <Badge variant="outline">{paper.category}</Badge>
-          <span className="text-gray-500 text-sm">{new Date(paper.publishedDate).toLocaleDateString('en-GB')}</span>
-          <span className="text-gray-500 text-sm">{paper.citations} citations</span>
+        <div className="flex items-center gap-2 mb-3 flex-wrap">
+          <Badge variant="outline" className="text-xs border-border text-muted-foreground">{paper.category}</Badge>
+          <span className="text-muted-foreground text-xs">{new Date(paper.publishedDate).toLocaleDateString('en-GB')}</span>
+          <span className="text-muted-foreground text-xs">{paper.citations} citations</span>
         </div>
 
         {/* Abstract */}
-        <p className={`text-gray-700 text-sm mb-4 ${isExpanded ? '' : 'line-clamp-3'}`}>
+        <p className={`text-muted-foreground text-xs flex-1 overflow-hidden ${isExpanded ? 'overflow-y-auto' : 'line-clamp-4'}`}>
           {paper.abstract}
         </p>
 
         {/* Actions */}
-        <div className="flex gap-2">
-          <Button variant="ghost" size="sm" onClick={() => setIsExpanded(!isExpanded)}>
+        <div className="flex gap-2 mt-3 pt-3 border-t border-border">
+          <Button variant="ghost" size="sm" className="text-xs text-muted-foreground hover:text-foreground h-7 px-2" onClick={() => setIsExpanded(!isExpanded)}>
             {isExpanded ? 'Show Less' : 'Show More'}
           </Button>
           {onSelectSummary && (
-            <Button size="sm" className="ml-auto" onClick={() => onSelectSummary(paper)}>
-              View Summary
+            <Button size="sm" className="ml-auto text-xs h-7 px-3 bg-primary hover:bg-primary/90" onClick={() => onSelectSummary(paper)}>
+              Summary
             </Button>
           )}
         </div>

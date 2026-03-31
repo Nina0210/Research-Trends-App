@@ -44,13 +44,13 @@ export default async function Home({ searchParams }: HomeProps) {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 font-sans">
+    <div className="min-h-screen bg-background font-sans">
       <Header />
 
-      <main className="max-w-5xl mx-auto p-6 space-y-6">
+      <main className="max-w-7xl mx-auto p-6 space-y-6">
         {/* Topic selector */}
         <div className="space-y-3">
-          <h2 className="text-2xl font-semibold text-blue-950">
+          <h2 className="text-2xl font-semibold text-foreground">
             Trending Papers — {topicLabel[topic] ?? topic}
           </h2>
           <Suspense fallback={null}>
@@ -61,8 +61,8 @@ export default async function Home({ searchParams }: HomeProps) {
         {/* Papers list — fetched server-side */}
         <Suspense
           fallback={
-            <div className="flex items-center gap-3 text-gray-500 text-sm py-8">
-              <span className="inline-block animate-spin rounded-full h-5 w-5 border-b-2 border-blue-900" />
+            <div className="flex items-center gap-3 text-muted-foreground text-sm py-8">
+              <span className="inline-block animate-spin rounded-full h-5 w-5 border-b-2 border-primary" />
               Loading papers…
             </div>
           }
