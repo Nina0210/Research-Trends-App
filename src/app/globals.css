@@ -51,7 +51,7 @@
 :root {
   --background: oklch(0.13 0.06 258);
   --foreground: oklch(0.95 0.02 258);
-  --card: oklch(24.623% 0.1058 263.833);
+  --card: oklch(19.789% 0.0733 264.467);
   --card-foreground: oklch(0.95 0.02 258);
   --popover: oklch(0.18 0.08 258);
   --popover-foreground: oklch(0.95 0.02 258);
