@@ -47,10 +47,10 @@ export default async function Home({ searchParams }: HomeProps) {
     <div className="min-h-screen bg-background font-sans">
       <Header />
 
-      <main className="max-w-7xl mx-auto p-6 space-y-6">
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 py-6 space-y-6">
         {/* Topic selector */}
         <div className="space-y-3">
-          <h2 className="text-2xl font-semibold text-foreground">
+          <h2 className="text-xl sm:text-2xl font-semibold text-foreground">
             Trending Papers — {topicLabel[topic] ?? topic}
           </h2>
           <Suspense fallback={null}>

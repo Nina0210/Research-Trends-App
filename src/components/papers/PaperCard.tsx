@@ -1,7 +1,7 @@
 'use client';
 
 import { Paper } from '@/lib/types';
-import { useState } from 'react';
+
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -13,12 +13,17 @@ interface PaperCardProps {
 }
 
 export default function PaperCard({ paper, onSelectSummary }: PaperCardProps) {
-  const [isExpanded, setIsExpanded] = useState(false);
-
   return (
-    <Card className="aspect-square flex flex-col overflow-hidden border-border bg-card">
+    <Card className="aspect-square flex flex-col overflow-hidden border-border bg-card relative">
       <CardContent className="p-5 flex flex-col h-full">
-        {/* Title + Trending Badge */}
+        {/* Expand button — absolute top right */}
+        {onSelectSummary && (
+          <Button size="icon" variant="ghost" className="absolute top-2 right-2 h-6 w-6 text-muted-foreground hover:text-white z-10" onClick={() => onSelectSummary(paper)}>
+            <Maximize2 size={13} />
+          </Button>
+        )}
+
+        {/* Title + Score */}
         <div className="flex items-start justify-between mb-2">
           <a
             href={paper.url}
@@ -47,18 +52,10 @@ export default function PaperCard({ paper, onSelectSummary }: PaperCardProps) {
         </div>
 
         {/* Abstract */}
-        <p className={`text-muted-foreground text-xs flex-1 overflow-hidden ${isExpanded ? 'overflow-y-auto' : 'line-clamp-4'}`}>
+        <p className="text-muted-foreground text-xs flex-1 overflow-hidden line-clamp-4">
           {paper.abstract}
         </p>
 
-        {/* Actions */}
-        <div className="flex gap-2 mt-3 pt-3 border-t border-border">
-          {onSelectSummary && (
-            <Button size="icon" variant="ghost" className="ml-auto h-7 w-7 text-muted-foreground hover:text-white" onClick={() => onSelectSummary(paper)}>
-              <Maximize2 size={15} />
-            </Button>
-          )}
-        </div>
       </CardContent>
     </Card>
   );

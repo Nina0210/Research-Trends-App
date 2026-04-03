@@ -3,6 +3,7 @@
 import { Paper, TextSummary } from '@/lib/types';
 import { useState, useEffect } from 'react';
 import { summaryService } from '@/lib/services/summaryService';
+import { X, ExternalLink } from 'lucide-react';
 
 interface SummaryPanelProps {
   paper: Paper | null;
@@ -78,24 +79,26 @@ export default function SummaryPanel({ paper, onClose, podcastUrl, onPodcastGene
   if (!paper) return null;
 
   return (
-    <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-      <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+    <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-end sm:items-center justify-center z-50">
+      <div className="bg-white rounded-t-2xl sm:rounded-lg shadow-xl w-full sm:max-w-2xl h-[90vh] sm:h-auto sm:max-h-[90vh] overflow-y-auto">
         {/* Header */}
-        <div className="sticky top-0 bg-gradient-to-r from-blue-950 to-blue-800 text-white p-6 flex items-start justify-between">
+        <div className="sticky top-0 bg-gradient-to-r from-blue-950 to-blue-800 text-white p-4 sm:p-6 flex items-start justify-between">
           <div className="flex-1">
-            <h2 className="text-2xl font-bold mb-2">{paper.title}</h2>
-            <p className="text-blue-200 text-sm">{paper.authors.join(', ')}</p>
+            <h2 className="text-lg sm:text-2xl font-bold mb-1 sm:mb-2 leading-snug">{paper.title}</h2>
+            <p className="text-blue-200 text-xs sm:text-sm">{paper.authors.join(', ')}</p>
           </div>
-          <button
-            onClick={onClose}
-            className="text-white hover:text-blue-200 text-2xl font-bold ml-4"
-          >
-            ✕
-          </button>
+          <div className="flex items-center gap-2 ml-4 shrink-0">
+            <a href={paper.url} target="_blank" rel="noopener noreferrer" className="text-white hover:text-blue-200">
+              <ExternalLink size={18} />
+            </a>
+            <button onClick={onClose} className="text-white hover:text-blue-200">
+              <X size={20} />
+            </button>
+          </div>
         </div>
 
         {/* Content */}
-        <div className="p-6">
+        <div className="p-4 sm:p-6">
           {loading && (
             <div className="flex items-center justify-center py-8">
               <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-900"></div>
@@ -153,23 +156,6 @@ export default function SummaryPanel({ paper, onClose, podcastUrl, onPodcastGene
           )}
         </div>
 
-        {/* Footer */}
-        <div className="border-t p-6 flex gap-2">
-          <a
-            href={paper.url}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex-1 bg-blue-950 hover:bg-blue-900 text-white px-4 py-2 rounded-lg font-medium text-center transition"
-          >
-            Read Full Paper
-          </a>
-          <button
-            onClick={onClose}
-            className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition"
-          >
-            Close
-          </button>
-        </div>
       </div>
     </div>
   );
