@@ -8,6 +8,7 @@ interface HFPaper {
   upvotes: number;
   authors: { name: string }[];
   ai_keywords?: string[];
+  ai_summary?: string;
 }
 
 export async function fetchHFTrending(maxResults = 20): Promise<Paper[]> {
@@ -33,7 +34,8 @@ export async function fetchHFTrending(maxResults = 20): Promise<Paper[]> {
       url: `https://arxiv.org/abs/${p.id}`,
       publishedDate: new Date(p.publishedAt),
       trendingScore: p.upvotes,
-      category: (p.ai_keywords?.[0] ?? 'Research'),
+      category: (p.ai_keywords?.slice(0, 3).join(', ') ?? 'Research'),
       citations: 0,
+      aiSummary: p.ai_summary,
     })) as Paper[];
 }

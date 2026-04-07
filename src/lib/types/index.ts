@@ -9,6 +9,7 @@ export interface Paper {
   trendingScore: number;
   category: string;
   citations: number;
+  aiSummary?: string;
 }
 
 // Summary types

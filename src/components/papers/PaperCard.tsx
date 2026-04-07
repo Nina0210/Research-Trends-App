@@ -33,7 +33,7 @@ export default function PaperCard({ paper, onSelectSummary }: PaperCardProps) {
           >
             {paper.title}
           </a>
-          <div className="flex items-center gap-0.5 ml-2 shrink-0 text-orange-300 text-xs font-medium">                                                    
+          <div className="flex items-center gap-0.5 ml-2 shrink-0 text-yellow-600/70 text-xs font-medium">                                                    
             <ChevronUp size={13} />                                                                                                                   
             {paper.trendingScore}                                                                                                                     
           </div> 
@@ -47,7 +47,9 @@ export default function PaperCard({ paper, onSelectSummary }: PaperCardProps) {
 
         {/* Category and Date */}
         <div className="flex items-center gap-2 mb-3 flex-wrap">
-          <Badge variant="outline" className="text-xs border-border text-muted-foreground">{paper.category}</Badge>
+          {paper.category.split(', ').map((kw) => (
+            <Badge key={kw} variant="outline" className="text-xs border-[#7b0d6e] text-[#e066cc] ">{kw}</Badge>
+          ))}
           <span className="text-muted-foreground text-xs">{new Date(paper.publishedDate).toLocaleDateString('en-GB')}</span>
         </div>
 
