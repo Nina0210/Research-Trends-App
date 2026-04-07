@@ -33,7 +33,7 @@ export default function PaperCard({ paper, onSelectSummary }: PaperCardProps) {
           >
             {paper.title}
           </a>
-          <div className="flex items-center gap-0.5 ml-2 shrink-0 text-yellow-600/70 text-xs font-medium">                                                    
+          <div className="flex items-center gap-0.5 ml-2 shrink-0 text-yellow-400/70 text-xs font-medium">                                                    
             <ChevronUp size={13} />                                                                                                                   
             {paper.trendingScore}                                                                                                                     
           </div> 
@@ -54,7 +54,7 @@ export default function PaperCard({ paper, onSelectSummary }: PaperCardProps) {
         </div>
 
         {/* Abstract */}
-        <p className="text-muted-foreground text-xs flex-1 overflow-hidden line-clamp-4">
+        <p className="text-muted-foreground text-xs flex-1 overflow-y-auto">
           {paper.abstract}
         </p>
 

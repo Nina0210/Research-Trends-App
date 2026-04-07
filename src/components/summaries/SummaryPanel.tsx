@@ -52,7 +52,10 @@ export default function SummaryPanel({ paper, onClose, podcastUrl, onPodcastGene
         <div className="sticky top-0 bg-gradient-to-r from-blue-950 to-blue-800 text-white p-4 sm:p-6 flex items-start justify-between">
           <div className="flex-1">
             <h2 className="text-lg sm:text-2xl font-bold mb-1 sm:mb-2 leading-snug">{paper.title}</h2>
-            <p className="text-blue-200 text-xs sm:text-sm">{paper.authors.join(', ')}</p>
+            <p className="text-blue-200 text-xs sm:text-sm">
+              {paper.authors.slice(0, 3).join(', ')}
+              {paper.authors.length > 3 && ` +${paper.authors.length - 3} more`}
+            </p>
           </div>
           <div className="flex items-center gap-2 ml-4 shrink-0">
             <a href={paper.url} target="_blank" rel="noopener noreferrer" className="text-white hover:text-blue-200">
