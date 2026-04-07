@@ -5,7 +5,7 @@ import { Paper } from '@/lib/types';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Maximize2 } from 'lucide-react';
+import { Maximize2, ChevronUp } from 'lucide-react';
 
 interface PaperCardProps {
   paper: Paper;
@@ -33,9 +33,10 @@ export default function PaperCard({ paper, onSelectSummary }: PaperCardProps) {
           >
             {paper.title}
           </a>
-          <Badge variant="secondary" className="ml-2 whitespace-nowrap shrink-0 bg-orange-900/40 text-orange-300 border-orange-800/50">
-            {Math.round(paper.trendingScore)}%
-          </Badge>
+          <div className="flex items-center gap-0.5 ml-2 shrink-0 text-orange-300 text-xs font-medium">                                                    
+            <ChevronUp size={13} />                                                                                                                   
+            {paper.trendingScore}                                                                                                                     
+          </div> 
         </div>
 
         {/* Authors */}
@@ -48,7 +49,6 @@ export default function PaperCard({ paper, onSelectSummary }: PaperCardProps) {
         <div className="flex items-center gap-2 mb-3 flex-wrap">
           <Badge variant="outline" className="text-xs border-border text-muted-foreground">{paper.category}</Badge>
           <span className="text-muted-foreground text-xs">{new Date(paper.publishedDate).toLocaleDateString('en-GB')}</span>
-          <span className="text-muted-foreground text-xs">{paper.citations} citations</span>
         </div>
 
         {/* Abstract */}

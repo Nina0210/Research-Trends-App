@@ -1,20 +1,15 @@
 import { Suspense } from 'react';
 import Header from '@/components/common/Header';
 import PapersList from '@/components/papers/PapersList';
-import TopicSelector from '@/components/papers/TopicSelector';
-import { fetchArxivTrending } from '@/lib/services/arxivService';
+import { fetchHFTrending } from '@/lib/services/hfService';
 import type { Paper } from '@/lib/types';
 
-interface HomeProps {
-  searchParams: Promise<{ topic?: string }>;
-}
-
-async function PapersSection({ topic }: { topic: string }) {
+async function PapersSection() {
   let papers: Paper[] = [];
   let error: string | null = null;
 
   try {
-    papers = await fetchArxivTrending(topic, 10);
+    papers = await fetchHFTrending(20);
   } catch (err) {
     error = err instanceof Error ? err.message : 'Failed to load papers';
   }
@@ -24,41 +19,22 @@ async function PapersSection({ topic }: { topic: string }) {
   }
 
   if (papers.length === 0) {
-    return <p className="text-sm text-gray-600">No trending papers found.</p>;
+    return <p className="text-sm text-muted-foreground">No trending papers found.</p>;
   }
 
   return <PapersList papers={papers} />;
 }
 
-export default async function Home({ searchParams }: HomeProps) {
-  const { topic = 'cs.AI' } = await searchParams;
-
-  const topicLabel: Record<string, string> = {
-    'cs.AI': 'Artificial Intelligence',
-    'cs.LG': 'Machine Learning',
-    'cs.CL': 'Natural Language Processing',
-    'cs.CV': 'Computer Vision',
-    'cs.RO': 'Robotics',
-    'quant-ph': 'Quantum Computing',
-    'physics': 'Physics',
-  };
-
+export default async function Home() {
   return (
     <div className="min-h-screen bg-background font-sans">
       <Header />
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 py-6 space-y-6">
-        {/* Topic selector */}
-        <div className="space-y-3">
-          <h2 className="text-xl sm:text-2xl font-semibold text-foreground">
-            Trending Papers — {topicLabel[topic] ?? topic}
-          </h2>
-          <Suspense fallback={null}>
-            <TopicSelector />
-          </Suspense>
-        </div>
+        <h2 className="text-xl sm:text-2xl font-semibold text-foreground">
+          Trending Papers Today
+        </h2>
 
-        {/* Papers list — fetched server-side */}
         <Suspense
           fallback={
             <div className="flex items-center gap-3 text-muted-foreground text-sm py-8">
@@ -67,7 +43,7 @@ export default async function Home({ searchParams }: HomeProps) {
             </div>
           }
         >
-          <PapersSection topic={topic} />
+          <PapersSection />
         </Suspense>
       </main>
     </div>
